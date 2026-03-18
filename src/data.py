@@ -99,7 +99,7 @@ def get_test_transform(mean, std):
     transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.repeat(3, 1, 1)),
-        transforms.Normalize(mean=[mean], std=[std])
+        transforms.Normalize(mean=(mean,mean,mean), std=(std,std,std))
 
     ])
     return transform
@@ -126,7 +126,7 @@ def get_train_transform(mean, std, is_flippable):
             transforms.RandomAffine(degrees=15, translate=(0.05, 0.05), scale=(0.9, 1.1)),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.Lambda(lambda x: x.repeat(3, 1, 1)),
-            transforms.Normalize(mean=[mean], std=[std])
+            transforms.Normalize(mean=(mean,mean,mean), std=(std,std,std))
 
         ])
     else:
@@ -134,7 +134,7 @@ def get_train_transform(mean, std, is_flippable):
             transforms.ToTensor(),
             transforms.RandomAffine(degrees=15, translate=(0.05, 0.05), scale=(0.9, 1.1)),
             transforms.Lambda(lambda x: x.repeat(3, 1, 1)),
-            transforms.Normalize(mean=[mean], std=[std])
+            transforms.Normalize(mean=(mean,mean,mean), std=(std,std,std))
 
         ])
     return transform

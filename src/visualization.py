@@ -1,8 +1,9 @@
-import matplotlib.pyplot as plt
 import random
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import scipy.ndimage
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 class Visualizer:
     """
@@ -246,4 +247,44 @@ class Visualizer:
         plt.plot(x, history['val_acc'], label='Validation accuracy', color='orchid')
         plt.title("Accuracy")
         plt.legend()
+        plt.show()
+
+    def show_confusion_matrix(self, predictions, targets):
+        """
+            Display confusion matrix and compute accuracy.
+
+            Parameters:
+            - predictions (np.ndarray): Predicted class labels.
+            - targets (np.ndarray): True class labels.
+            """
+        cm = confusion_matrix(targets, predictions)
+        cm_display = ConfusionMatrixDisplay(confusion_matrix=cm)
+        cm_display.plot(cmap='RdPu')
+        plt.title("Confusion Matrix")
+        plt.gca().grid(False)
+        plt.show()
+
+        acc = (predictions == targets).mean()
+        print(f"Test accuracy: {np.round(acc, 4)}")
+
+    def show_misclassified_images(self, test_data, preds, labels, idxs, n):
+        """
+        Display misclassified images.
+
+        Parameters:
+        - test_data (np.ndarray): Array of test images.
+        - preds (np.ndarray): Predicted labels.
+        - labels (np.ndarray): True labels.
+        - idxs (np.ndarray): Indices of misclassified samples.
+        - n (int): Number of images to display.
+        """
+        n = min(n, len(idxs))
+
+        plt.figure(figsize=(2*n, 2))
+        for i, idx in enumerate(idxs[:n]):
+            plt.subplot(1, n, i + 1)
+            plt.imshow(test_data[idx], cmap='gray')
+            plt.title(f"p:{self.num_to_class[preds[idx]]}\nt:{self.num_to_class[labels[idx]]}")
+            plt.axis('off')
+        plt.tight_layout()
         plt.show()
