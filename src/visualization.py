@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import scipy.ndimage
+import torch
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import torch.nn.functional as F
 
 class Visualizer:
     """
@@ -287,4 +289,56 @@ class Visualizer:
             plt.title(f"p:{self.num_to_class[preds[idx]]}\nt:{self.num_to_class[labels[idx]]}")
             plt.axis('off')
         plt.tight_layout()
+        plt.show()
+
+    def preprocess_cam(self, cam):
+        """
+        Preprocess CAM for visualization.
+
+        Applies ReLU to remove negative values, resizes the CAM to match
+        the original image size, and normalizes values to the range [0, 1].
+
+        Parameters:
+        - cam (torch.Tensor): Raw CAM tensor of shape (H, W).
+
+        Returns:
+        - cam (torch.Tensor): Processed CAM tensor resized and normalized
+          for visualization.
+        """
+        target_size = self.data.shape[-2:]
+        cam = torch.relu(cam)
+        cam = F.interpolate(cam.unsqueeze(0).unsqueeze(0), size=target_size, mode='bilinear', align_corners=False)
+        cam = cam.squeeze()
+        cam = cam - cam.min()
+        cam = cam/(cam.max() + 1e-8)
+
+        return cam
+
+    def show_cam(self, cam, img):
+        """
+        Visualize CAM on top of the original image.
+
+        Displays the grayscale image with the CAM heatmap on top,
+        highlighting regions important for model prediction.
+
+        Parameters:
+        - cam (torch.Tensor or np.ndarray): Processed CAM.
+        - img (torch.Tensor or np.ndarray): Input image corresponding to CAM.
+
+        Notes:
+        - If tensors are provided, they are automatically converted to NumPy.
+        - For multi-channel input, only the first channel is displayed.
+        """
+        if torch.is_tensor(cam):
+            cam = cam.cpu().detach().numpy()
+        if torch.is_tensor(img):
+            img = img.cpu().detach().numpy()
+        if len(img.shape) == 3:
+            img = img[0]
+        plt.figure()
+        plt.imshow(img, cmap='gray')
+        plt.imshow(cam, cmap='jet', alpha=0.5)
+        plt.axis('off')
+        plt.title("CAM visualization")
+        plt.colorbar()
         plt.show()

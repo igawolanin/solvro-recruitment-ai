@@ -1,5 +1,5 @@
 .venv/
 .idea/
 __pycache__/
-.DS_Store
+.DS_Storgit rm -r --cached .ideae
 *.env
