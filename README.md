@@ -20,6 +20,7 @@ The repository is divided into separate files, each responsible for a different 
 - `src/`: Contains the source code, organized into files:
     - `research.ipynb`: Executes and analyses experiments.
     - `config.py`: Contains configuration.
+    - `cam.py`: Computations for Class Activation Mapping.
     - `data.py`: Loads, splits and transforms data.
     - `eval.py`: Performs evaluation. 
     - `models.py`: Defines models.
